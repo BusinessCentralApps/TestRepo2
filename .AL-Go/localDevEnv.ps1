@@ -8,8 +8,8 @@ Param(
     [string] $auth = "",
     [pscredential] $credential = $null,
     [string] $licenseFileUrl = "",
-    [string] $insiderSasToken = "",
-    [switch] $fromVSCode
+    [switch] $fromVSCode,
+    [switch] $accept_insiderEula
 )
 
 $errorActionPreference = "Stop"; $ProgressPreference = "SilentlyContinue"; Set-StrictMode -Version 2.0
@@ -20,10 +20,10 @@ $webClient.CachePolicy = New-Object System.Net.Cache.RequestCachePolicy -argumen
 $webClient.Encoding = [System.Text.Encoding]::UTF8
 Write-Host "Downloading GitHub Helper module"
 $GitHubHelperPath = "$([System.IO.Path]::GetTempFileName()).psm1"
-$webClient.DownloadFile('https://raw.githubusercontent.com/microsoft/AL-Go-Actions/v3.2/Github-Helper.psm1', $GitHubHelperPath)
+$webClient.DownloadFile('https://raw.githubusercontent.com/freddydk/AL-Go/issue709/Actions/Github-Helper.psm1', $GitHubHelperPath)
 Write-Host "Downloading AL-Go Helper script"
 $ALGoHelperPath = "$([System.IO.Path]::GetTempFileName()).ps1"
-$webClient.DownloadFile('https://raw.githubusercontent.com/microsoft/AL-Go-Actions/v3.2/AL-Go-Helper.ps1', $ALGoHelperPath)
+$webClient.DownloadFile('https://raw.githubusercontent.com/freddydk/AL-Go/issue709/Actions/AL-Go-Helper.ps1', $ALGoHelperPath)
 
 Import-Module $GitHubHelperPath
 . $ALGoHelperPath -local
@@ -34,13 +34,13 @@ $project = GetProject -baseFolder $baseFolder -projectALGoFolder $PSScriptRoot
 Clear-Host
 Write-Host
 Write-Host -ForegroundColor Yellow @'
-  _                     _   _____             ______            
- | |                   | | |  __ \           |  ____|           
+  _                     _   _____             ______
+ | |                   | | |  __ \           |  ____|
  | |     ___   ___ __ _| | | |  | | _____   __ |__   _ ____   __
  | |    / _ \ / __/ _` | | | |  | |/ _ \ \ / /  __| | '_ \ \ / /
- | |____ (_) | (__ (_| | | | |__| |  __/\ V /| |____| | | \ V / 
- |______\___/ \___\__,_|_| |_____/ \___| \_/ |______|_| |_|\_/  
-                                                                
+ | |____ (_) | (__ (_| | | | |__| |  __/\ V /| |____| | | \ V /
+ |______\___/ \___\__,_|_| |_____/ \___| \_/ |______|_| |_|\_/
+
 '@
 
 Write-Host @'
@@ -131,7 +131,7 @@ CreateDevEnv `
     -auth $auth `
     -credential $credential `
     -licenseFileUrl $licenseFileUrl `
-    -insiderSasToken $insiderSasToken
+    -accept_insiderEula:$accept_insiderEula
 }
 catch {
     Write-Host -ForegroundColor Red "Error: $($_.Exception.Message)`nStacktrace: $($_.scriptStackTrace)"
